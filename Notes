@@ -1,0 +1,25 @@
+
+# General background:
+
+  - they did a term search on 5 topics, immigration, death penalty,
+    same-sex, smoking, guncontrol (todo: climate change, ...)
+  - Read ~3000 articles per topic by hand (multiple coders per, defined codebook)
+  - got more docs (~30K) and coded by ML
+
+TODO: Send email for the plots that she was interested in.
+
+Duncan also has some docs - want to focus on the data on github (is this public?)
+
+Potential plots/EDA:
+
+1) look at all frames, pro + con
+2) public opinion
+3) connect to individual articles
+4) events
+5) understand why changes in # of articles
+
+p = primary frame
+b = occurs anywhere in body
+
+Look at where the p's are close, maybe plot top 3 frames. 
+Look at polling numbers vs. articles #, tone

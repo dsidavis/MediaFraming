@@ -1,0 +1,152 @@
+---
+title: Intro EDA of Media Framing Data
+date: \today{}
+geometry: margin=1in
+output: html_document
+---
+
+# Background
+
+Media matters, sentiment influences public opinion.  Lens (framing)
+also influences public opinion.  Example: capital punishment, rise and
+fall 1960-2005.  How does it generalize to other issues?  US newspaper
+(13 major papers) from 1980-2012/2013. Issues: immigration, gun
+control, smoking/tobacco, same-sex marriage, climate change. Next:
+capital punishment (control). Have full text and human annotations,
+coded by 1) overall tone (pro, anti), 2) frames used to talk about it
+(codebook: economic, morally, security - not mutually exclusive; and
+primary frame). Coders are trained to 95% accuracy on set data; 2
+coders per article, check if agree/disagree on tone and primary frame,
+arbitrate and decide. Code frame and tone at separate times, blind to
+source, author and date. Use machine learning to give probabilities to
+unannotated articles.
+
+LexusNexus - used to get the text from the articles. Had keywords,
+then took all hits.  Duncan: check if we can have access to raw
+data...
+
+Machine Learning: Noah Smith, computational linguist
+(Univ. Washington), grad student Dallas Card (Carnige Mellon)
+
+Look at how shifts in tone, framing shift with public opinion.  
+Goal: Exploratory: Looking for patterns within a topic Looking for
+patterns of framing across topics
+
+Data repository: Github
+
+Programming: Stata Learning R
+
+Action Items: List of known patterns, hunch patterns Confirm
+suspected, find unexpected Send github data repository (article
+probabilities)
+  - this is the “final” version Send manually coded, and original
+    articles Send public opinion data (Roeper derived)
+  - note, it is fairly sparse, series
+  - dependent Send list of key events in the different issue areas
+
+# Data
+
+```{r}
+
+im = read.csv("../MediaFramingData/public_opinion_analysis/data/immigration_with_metadata_2017_05_25.csv",
+              stringsAsFactors = FALSE)
+dim(im)
+
+colnames(im)
+```
+
+p = primary frame, sum to 1
+b = occurs in body, do not sum to one
+
+## Sources
+
+```{r}
+rankSource = sort(table(im$Source), decreasing = TRUE)
+round(rankSource / nrow(im), 3)
+
+topSource = names(rankSource)[1:5]
+
+```
+
+Mostly NYTimes articles. 
+
+## Dates
+
+```{r}
+plot(table(im$Year),
+     xlab = "Year",
+     ylab = "n")
+```
+
+Looks to be a peak ~2006. Almost 2x as many articles.
+
+```{r}
+
+im$FullDate = as.Date(as.character(im$FullDate),
+                      format = "%Y%m%d")
+plot(table(im$FullDate))
+```
+
+What is going on with 2006? Why are there so many?
+
+```{r}
+im2006 = subset(im, im$Year == 2006)
+
+round(sort(table(im2006$Source)) / nrow(im2006), 3)
+```
+
+Compared to overall data set, NYTimes is underrepresented, Denver post
+is overrepresented.
+
+```{r}
+plot(table(im2006$FullDate))
+i = im2006$Source %in% c(topSource, "denver post")
+tt = table(im2006$Month[i], im2006$Source[i])
+
+round(tt / colSums(tt), 3) * 100
+```
+
+Clearly a peak in May 2006 across all the top papers. What happened
+then? [Massive immigration
+protests](http://www.cnn.com/SPECIALS/2006/yir/timeline/) and
+[immigration
+bill](http://www.cnn.com/2006/POLITICS/05/25/immigration/index.html).
+
+
+Cool.
+
+
+Using a simple smoothing kernel to look at dates with higher than
+"average" coverage.
+
+```{r}
+source("../R/eda_funs.R")
+peaks = findPeaks(im$FullDate, thrsh=2)
+sort(table(weekdays(as.Date(peaks))))
+
+```
+
+```{r}
+library(ggplot2)
+
+frames = extractFrameNum(getTopFrames(im), 1)
+
+# Not best
+cc = cut(im$Pro, 3, labels = c("anti","neutral", "pro"))
+
+cc = factor(apply(im[,c("Anti","Neutral", "Pro")], 1, which.max),
+            labels = c("Anti","Neutral", "Pro"))
+
+# Cause ggplot insists on data.frames
+dd = data.frame(x = im$Year, frame = names(frames), c = cc)
+
+i = sort(table(dd$frame), decreasing = TRUE)
+
+ggplot(subset(dd, dd$frame %in% names(i)[1:4]),
+       aes(x = x, fill = frame)) +
+    geom_density(alpha = 0.2) +
+    facet_wrap(~c, ncol = 1)
+
+```
+
+How often is frame X

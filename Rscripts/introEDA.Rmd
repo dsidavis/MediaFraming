@@ -47,9 +47,11 @@ probabilities)
 # Data
 
 ```{r}
+source("../R/eda_funs.R")
+source("setup.R")
+library(ggplot2)
+im = frames$"../MediaFramingData/public_opinion_analysis/data/immigration_with_metadata_2017_05_25.csv"
 
-im = read.csv("../MediaFramingData/public_opinion_analysis/data/immigration_with_metadata_2017_05_25.csv",
-              stringsAsFactors = FALSE)
 dim(im)
 
 colnames(im)
@@ -67,27 +69,80 @@ round(rankSource / nrow(im), 3)
 topSource = names(rankSource)[1:5]
 
 ```
-
 Mostly NYTimes articles. 
+
+How often is that order preserved?
+
+```{r}
+i = im$Source %in% topSource
+byMonth = tapply(factor(im[i,"Source"]), paste0(im$Year[i],"-", im$Month[i]), table)
+
+# Cheese - just use first day of month, i.e. month starting
+date = as.Date(paste0(names(byMonth), "-1"), format = "%Y-%m-%d")
+
+#ggplot wants long data
+byMonth = do.call(rbind, lapply(byMonth, function(x) data.frame(names(x), x)))
+byMonth$date = rep(date, each = length(topSource))
+
+# Check
+aggregate(byMonth$Freq, list(byMonth$Var1), sum)
+table(im[i,"Source"])
+# Looks good
+
+ggplot(byMonth, aes(x = date, y = Freq, fill = Var1)) +
+    geom_area(alpha = 0.25)
+
+ggplot(byMonth, aes(x = date, y = Freq, color = Var1)) +
+    geom_line() + facet_grid(~Var1)
+
+# How often is NYTimes on top?
+top = by(byMonth, byMonth$date, function(x) x$Var1[which.max(x$Freq)])
+
+sort(table(levels(byMonth$Var1)[top]))
+```
+
+NYTimes is almost always the top source.
+
+How much more?
+
+```{r}
+ans = by(byMonth, byMonth$date, function(x){
+    i = order(x$Freq, decreasing = TRUE)
+    # browser()
+    x$Freq[x$Var1 == "new york times"] - x$Freq[i[2]]
+    })
+summary(ans)
+```
+
+NYTimes only loses by a narrow margin, but sometimes overwhelms the
+others.
+
+```{r}
+plot(ans ~ as.Date(names(ans)), type = "l",
+     ylab = "Difference between NYTimes and #2",
+     xlab = "Date")
+```
+
+
 
 ## Dates
 
 ```{r}
 plot(table(im$Year),
      xlab = "Year",
-     ylab = "n")
+     ylab = "n", type = "b")
+
 ```
 
 Looks to be a peak ~2006. Almost 2x as many articles.
 
 ```{r}
-
-im$FullDate = as.Date(as.character(im$FullDate),
-                      format = "%Y%m%d")
 plot(table(im$FullDate))
+
 ```
 
 What is going on with 2006? Why are there so many?
+
 
 ```{r}
 im2006 = subset(im, im$Year == 2006)
@@ -149,4 +204,31 @@ ggplot(subset(dd, dd$frame %in% names(i)[1:4]),
 
 ```
 
-How often is frame X
+# Any seasonal pattern?
+
+```{r}
+plot(table(im$Week), type = "b")
+
+```
+
+
+```{r}
+
+```
+
+# Bias in source?
+
+```{r}
+bias = with(im, aggregate(cbind(Pro, Neutral, Anti), list(Source = Source, Year = Year), median))
+
+dd = subset(bias, Source %in% topSource)
+lapply(c("Pro", "Neutral", "Anti"), function(v)
+    ggplot(dd, aes(x = Year, y = dd[,v])) +
+    geom_smooth(se = FALSE, color = "black")+
+    facet_wrap(~Source) +
+    geom_hline(yintercept = .5, lty = 2) +
+    theme_bw() +
+    ggtitle(v)
+    )
+
+```

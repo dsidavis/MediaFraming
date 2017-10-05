@@ -40,3 +40,7 @@ plotTopFrames = function(frame){
            col = seq(ncol(frame$x)))
 }
 
+byTimeLong = function(var, time)
+{
+    
+}

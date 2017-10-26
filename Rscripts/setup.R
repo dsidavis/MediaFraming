@@ -44,4 +44,7 @@ polls = lapply(polls, function(x) {
     x
 })
 
-
+# Fix the Source names in gun control
+x = frames[["guncontrol"]]$Source
+frames[["guncontrol"]]$Source.orig = x
+frames[["guncontrol"]]$Source = gsub(" blogs.*$| \\(.*\\)$", "", x)

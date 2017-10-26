@@ -25,7 +25,7 @@ plot_frames = function(df, df_polls, frame_names, main)
         geom_line() +
         geom_line(data = byWeek[con,])+ 
         theme_bw() +
-        geom_line(data = df_polls, aes(x = Date, y = Index), color = "black") +
+        geom_point(data = df_polls, aes(x = Date, y = Index), method = "loess", color = "black") +
         geom_smooth(data = df_polls, aes(x = Date, y = Index), color = "gray", se = FALSE) +
         xlab("Date (week start)") +
         xlim(as.Date(c("1980-01-01", "2013-01-01"))) + 
@@ -36,4 +36,25 @@ plot_frames = function(df, df_polls, frame_names, main)
     b = ggplotly(a) %>% layout(xaxis = list(rangeslider = list(type = "date"))) 
 
     b
+}
+
+plot_sources = function(df, main)
+{
+    bySource =  aggregate(Pro ~ paste(Month, Year) + Source, data = df, mean)
+    bySource$start_date = as.Date(paste("1", bySource$'paste(Month, Year)'),
+                                  format = "%d %m %Y")
+    
+    bias = tapply(bySource$Pro, bySource$Source, median)
+    bySource$Source = factor(bySource$Source, levels = names(bias)[order(bias)])
+    
+    c = ggplot(bySource, aes(x = start_date, y = Pro, color = Source)) +
+        geom_point(size = 0.5) +
+        geom_smooth(se = FALSE) +
+        theme_bw() +
+        geom_hline(yintercept = 0.5, color = "black", linetype = "dashed") + 
+        facet_wrap(~Source) +
+        ggtitle(paste0("Median position over time: ", main))
+    
+    ggplotly(c)
+
 }

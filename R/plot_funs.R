@@ -3,6 +3,17 @@
 library(ggplot2)
 
 
+getSurges = function(df, threshold)
+{
+    by(df, list(df$top_frame, df$tone), function(x, threshold){
+        x = x[order(x$interval),]
+        d = abs(x$Count) >= threshold
+        # browser()
+        x[d,]
+        }, threshold = threshold)
+}
+
+
 byInterval = function(df, interval)
     # Interval is just a vector of the time you want to collapse by
 {

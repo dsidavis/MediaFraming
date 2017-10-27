@@ -23,6 +23,7 @@ sourcePlots = lapply(names(frames), function(name)
     plot_sources(frames[[name]], name))
 
 names(sourcePlots) = names(frames)
+sourcePlots
 
 lapply(names(sourcePlots), function(name)
     htmlwidgets::saveWidget(sourcePlots[[name]], file = paste0(name, "-source.html")))
@@ -31,3 +32,21 @@ lapply(names(sourcePlots), function(name)
 p = plot_ly(data = frames[[1]], x = ~Week_start, y = ~Pro, color = ~top_frame) %>%
     add_trace()
 p
+
+# Look at the intervals where frames are surging across topics
+
+byWeeks = lapply(seq_along(frames), function(i) {
+    ans = byInterval(frames[[i]], frames[[i]]$Week_start)
+    ans$topic = names(frames)[i]
+    ans
+})
+
+ff = lapply(byWeeks, getSurges, threshold = 5)
+ff = do.call(rbind, lapply(ff, function(x) do.call(rbind, x)))
+ff = ff[order(ff$interval),]
+c = ggplot(ff, aes(x = interval, y = Count, color = top_frame, shape = topic))+
+    geom_point(alpha = 0.5) +
+    theme_bw() +
+    xlab("Date")
+
+ggplotly(c) %>% layout(xaxis = list(rangeslider = list(type = "date"))) 

@@ -2,21 +2,23 @@
 
 library(ggplot2)
 
+
+byInterval = function(df, interval)
+    # Interval is just a vector of the time you want to collapse by
+{
+    byX = aggregate(Pro ~ interval + tone + top_frame, data = df, length)
+    byX = byX[order(byX$interval),]
+    
+    colnames(byX)[4] = "Count"
+    
+    byX$Count[byX$tone == "Anti"] = byX$Count[byX$tone == "Anti"] * -1
+    byX
+}
+
 plot_frames = function(df, df_polls, frame_names, main)
 {
-    ps = grep("^p[0-9]{1,2}$", colnames(df))
 
-    df$top_frame =  factor(apply(df[,ps], 1, which.max),
-                       levels = 0:14, labels = frame_names$X__3)
-
-    df$tone = cut(df$Pro, 3, labels = c("Con", "Neutral","Pro"))
-    byWeek = aggregate(Pro ~ Week_start + tone + top_frame, data = df, length)
-    byWeek = byWeek[order(byWeek$Week_start),]
-    
-    colnames(byWeek)[4] = "Count"
-    
-    byWeek$Count[byWeek$tone == "Con"] = byWeek$Count[byWeek$tone == "Con"] * -1
-
+    byWeek = byInterval(df, df$Week_start)
     pro = byWeek$tone == "Pro"
     con = byWeek$tone == "Con"
     
@@ -25,14 +27,16 @@ plot_frames = function(df, df_polls, frame_names, main)
         geom_line() +
         geom_line(data = byWeek[con,])+ 
         theme_bw() +
-        geom_point(data = df_polls, aes(x = Date, y = Index), method = "loess", color = "black") +
-        geom_smooth(data = df_polls, aes(x = Date, y = Index), color = "gray", se = FALSE) +
+        geom_point(data = df_polls, aes(x = Date, y = Index, color = House, size = N),
+                   alpha = 0.5) +
+        geom_smooth(data = df_polls, aes(x = Date, y = Index), method = "loess",
+                    span = 0.1, color = "gray", se = FALSE) +
         xlab("Date (week start)") +
         xlim(as.Date(c("1980-01-01", "2013-01-01"))) + 
         scale_y_continuous(sec.axis = sec_axis(~., name = "Public polling"))+
         ggtitle(main) +
         geom_hline(yintercept = 50, linetype = "dashed")
-
+    
     b = ggplotly(a) %>% layout(xaxis = list(rangeslider = list(type = "date"))) 
 
     b
@@ -40,16 +44,17 @@ plot_frames = function(df, df_polls, frame_names, main)
 
 plot_sources = function(df, main)
 {
-    bySource =  aggregate(Pro ~ paste(Month, Year) + Source, data = df, mean)
-    bySource$start_date = as.Date(paste("1", bySource$'paste(Month, Year)'),
-                                  format = "%d %m %Y")
+    # bySource =  aggregate(Pro ~ paste(Month, Year) + Source, data = df, mean)
+    # bySource$start_date = as.Date(paste("1", bySource$'paste(Month, Year)'),
+                                  # format = "%d %m %Y")
+    bySource =  aggregate(Pro ~ Week_start + Source, data = df, mean)
     
     bias = tapply(bySource$Pro, bySource$Source, median)
     bySource$Source = factor(bySource$Source, levels = names(bias)[order(bias)])
     
-    c = ggplot(bySource, aes(x = start_date, y = Pro, color = Source)) +
-        geom_point(size = 0.5) +
-        geom_smooth(se = FALSE) +
+    c = ggplot(bySource, aes(x = Week_start, y = Pro, color = Source)) +
+        geom_point(size = 0.5, alpha = 0.35) +
+        geom_smooth(se = FALSE, span = 0.5) +
         theme_bw() +
         geom_hline(yintercept = 0.5, color = "black", linetype = "dashed") + 
         facet_wrap(~Source) +

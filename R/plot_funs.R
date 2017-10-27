@@ -19,11 +19,12 @@ plot_frames = function(df, df_polls, frame_names, main)
 {
 
     byWeek = byInterval(df, df$Week_start)
+
     pro = byWeek$tone == "Pro"
-    con = byWeek$tone == "Con"
+    con = byWeek$tone == "Anti"
     
     a = ggplot(byWeek[pro,],
-               aes(x = Week_start, y = Count, color = top_frame)) +
+               aes(x = interval, y = Count, color = top_frame)) +
         geom_line() +
         geom_line(data = byWeek[con,])+ 
         theme_bw() +

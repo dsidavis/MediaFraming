@@ -26,10 +26,11 @@ byInterval = function(df, interval)
     byX
 }
 
-plot_frames = function(df, df_polls, frame_names, main)
+plot_frames = function(df, df_polls, frame_names, main, interval = df$Week_start,
+                       polls = TRUE)
 {
 
-    byWeek = byInterval(df, df$Week_start)
+    byWeek = byInterval(df, interval)
 
     pro = byWeek$tone == "Pro"
     con = byWeek$tone == "Anti"
@@ -39,16 +40,18 @@ plot_frames = function(df, df_polls, frame_names, main)
         geom_line() +
         geom_line(data = byWeek[con,])+ 
         theme_bw() +
-        geom_point(data = df_polls, aes(x = Date, y = Index, color = House, size = N),
-                   alpha = 0.5) +
-        geom_smooth(data = df_polls, aes(x = Date, y = Index), method = "loess",
-                    span = 0.1, color = "gray", se = FALSE) +
         xlab("Date (week start)") +
-        xlim(as.Date(c("1980-01-01", "2013-01-01"))) + 
+        xlim(as.Date(c(min(byWeek$interval), "2013-01-01"))) + 
         scale_y_continuous(sec.axis = sec_axis(~., name = "Public polling"))+
         ggtitle(main) +
         geom_hline(yintercept = 50, linetype = "dashed")
-    
+    if(polls)
+        a = a +            
+            geom_point(data = df_polls, aes(x = Date, y = Index, color = House, size = N),
+                       alpha = 0.5) +
+            geom_smooth(data = df_polls, aes(x = Date, y = Index), method = "loess",
+                        span = 0.1, color = "gray", se = FALSE)
+
     b = ggplotly(a) %>% layout(xaxis = list(rangeslider = list(type = "date"))) 
 
     b

@@ -53,7 +53,8 @@ polls = lapply(polls, function(x) {
     x$Date = as.Date(x$Date, format = "%m/%d/%y")
     if(is.null(x$House))
         x$House = ""
-    x
+    i = as.integer(format(x$Date, "%Y")) < 2017
+    x[i,]
 })
 
 # Fix the Source names in gun control

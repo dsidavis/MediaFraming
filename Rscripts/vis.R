@@ -13,6 +13,30 @@ framePlots
 lapply(names(framePlots), function(name)
     htmlwidgets::saveWidget(framePlots[[name]], file = paste0(name, ".html")))
 
+# Monthly
+framePlots.m = lapply(names(frames), function(name)
+    plot_frames(frames[[name]], polls[[name]], frame_names, main = name,
+                interval = as.Date(format(frames[[name]]$date, "%Y-%m-01")),
+                polls = FALSE))
+
+names(framePlots.m) = names(frames)
+framePlots.m
+
+lapply(names(framePlots), function(name)
+    htmlwidgets::saveWidget(framePlots[[name]], file = paste0(name, "-monthly.html")))
+
+# Yearly
+framePlots.y = lapply(names(frames), function(name)
+    plot_frames(frames[[name]], polls[[name]], frame_names, main = name,
+                interval = as.Date(format(frames[[name]]$date, "%Y-01-01")),
+                polls = FALSE))
+
+names(framePlots.y) = names(frames)
+framePlots.y
+lapply(names(framePlots), function(name)
+    htmlwidgets::saveWidget(framePlots[[name]], file = paste0(name, "-yearly.html")))
+
+
 # Sources
 # by week is too many points
 

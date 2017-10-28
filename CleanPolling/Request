@@ -1,0 +1,8 @@
+If you could connect us with an intern to help us identify in our polling data 1) wonky dates and 2) duplicate surveys, I'd be very grateful!  
+
+Attached is a full version of the polling data, where after the first 5 tabs (which you should ignore -- I'm just keeping them in so I don't have to save a second version of the file which could lead to confusion), each issue has its own tab: abortion, energy, NASA, race, climate, immigration, same-sex marriage, gun control, and the death penalty.  We're only currently interested in the last four issues (in bold), but if an intern is able to deal with the other ones as well, that would be even better! 
+
+In each issue's tab, the columns that will help are:
+* Date (the date the survey was asked)
+* L1-C5 (the percentage of respondents who selected the most liberal response up to the percentage who selected the most conservative response)
+* N (the total number of people sampled)

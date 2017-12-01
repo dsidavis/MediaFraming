@@ -23,7 +23,7 @@ names(framePlots.m) = names(frames)
 framePlots.m
 
 lapply(names(framePlots), function(name)
-    htmlwidgets::saveWidget(framePlots[[name]], file = paste0(name, "-monthly.html")))
+    htmlwidgets::saveWidget(framePlots.m[[name]], file = paste0(name, "-monthly.html")))
 
 # Yearly
 framePlots.y = lapply(names(frames), function(name)
@@ -34,7 +34,7 @@ framePlots.y = lapply(names(frames), function(name)
 names(framePlots.y) = names(frames)
 framePlots.y
 lapply(names(framePlots), function(name)
-    htmlwidgets::saveWidget(framePlots[[name]], file = paste0(name, "-yearly.html")))
+    htmlwidgets::saveWidget(framePlots.y[[name]], file = paste0(name, "-yearly.html")))
 
 
 # Sources

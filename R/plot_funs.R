@@ -27,7 +27,7 @@ byInterval = function(df, interval)
 }
 
 plot_frames = function(df, df_polls, frame_names, main, interval = df$Week_start,
-                       polls = TRUE)
+                       polls = TRUE, span = 0.1)
 {
 
     byWeek = byInterval(df, interval)
@@ -50,7 +50,7 @@ plot_frames = function(df, df_polls, frame_names, main, interval = df$Week_start
             geom_point(data = df_polls, aes(x = Date, y = Index, color = House, size = N),
                        alpha = 0.5) +
             geom_smooth(data = df_polls, aes(x = Date, y = Index), method = "loess",
-                        span = 0.1, color = "gray", se = FALSE)
+                        span = span, color = "gray", se = FALSE)
 
     b = ggplotly(a) %>% layout(xaxis = list(rangeslider = list(type = "date"))) 
 

@@ -1,0 +1,16 @@
+<html>
+    <head>
+</head>	
+<body>
+<input id="b1" type="button" name="Toggle Polling" value="toggle" onclick="alert('b1')"/>
+<input id="b2" type="button" name="Toggle Polling" value="toggle" onclick="alert('in b2 onclick');"/>
+<input id="b3" type="button" name="Toggle Polling" value="toggle 3" onclick="
+var el = document.getElementById('b4');
+var ev = new Event('click');
+ev.myData = 'bob';
+el.dispatchEvent(ev);"/>
+
+<input id="b4" type="button" name="Toggle Polling" value="toggle" onclick="alert('myData = ' + window.event.myData  + ' ' + this.id); "/>
+</body>	
+</html>
+

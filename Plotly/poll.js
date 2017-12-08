@@ -46,6 +46,14 @@ function togglePolling()
     for(i=0; i < els.length; i++) {
 	els[i].setAttribute('visibility', pollingOn ? 'hidden' : 'visible');	
     }
+
+    // toggle the smooth line if it is there.
+    var xp = "//svg:g[contains(svg:path/@style, 'rgb(190, 190, 190)')]";
+    var el = document.evaluate(xp, document, NSResolver, XPathResult.ANY_TYPE, null);
+    var sm = el.iterateNext();
+    //    alert("smooth " + sm);
+    sm.setAttribute('visibility', pollingOn ? 'hidden' : 'visible');	
+    
     // now toggle the dashed line.
     toggleLine();
     pollingOn = !pollingOn;    

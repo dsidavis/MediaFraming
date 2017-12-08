@@ -1,0 +1,14 @@
+
+1. To get content from the HTML in JavaScript via XPath, use document.evaluate()
+```
+z = document.evaluate("//text()[. = 'QUINN']/../..", document, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null)
+```
+
+
+1. To get the expanded HTML content after it is fully rendered and dynamically generated
+ (so includes the SVG)
+  + in Google Chrome
+  + load the page
+  + right-click (control-click) on the background of the page
+  + Select Save As
+

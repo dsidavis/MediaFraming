@@ -28,6 +28,11 @@ function togglePolling()
 //	toggleHouse(HouseNames[i]);
 
     // now toggle the dashed line.
+    toggleLine();
+}
+
+function toggleLine()
+{
     var el = document.evaluate("//svg:path[@class='js-line' and contains(@style, 'rgb(0, 0, 0)')]", document, NSResolver, XPathResult.ANY_TYPE, null);
     el = el.iterateNext();
     alert("line: " + el + ' pollingOn = ' + pollingOn);

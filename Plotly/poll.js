@@ -7,9 +7,11 @@ function NSResolver (nsPrefix)
     return null;
 }
 
+
+// Not being used now as synthetic events needs more discovery for plotly.
 function toggleHouse (house)
 {
-    // /following-sibling::svg:rect
+    // Should find the /following-sibling::svg:rect and don't use nextSibling.
     var el = document.evaluate("//svg:text[. = '" + house + "']", document, NSResolver, XPathResult.ANY_TYPE, null);
     var tmp = el.iterateNext();
     alert("event: " + house + ' ' + tmp + ' ' + tmp.textContent + ' ');
@@ -47,12 +49,15 @@ function togglePolling()
 	els[i].setAttribute('visibility', pollingOn ? 'hidden' : 'visible');	
     }
 
+    
     // toggle the smooth line if it is there.
+    // relies on knowing its gray.
     var xp = "//svg:g[contains(svg:path/@style, 'rgb(190, 190, 190)')]";
     var el = document.evaluate(xp, document, NSResolver, XPathResult.ANY_TYPE, null);
     var sm = el.iterateNext();
-    //    alert("smooth " + sm);
-    sm.setAttribute('visibility', pollingOn ? 'hidden' : 'visible');	
+    if(sm) {
+	sm.setAttribute('visibility', pollingOn ? 'hidden' : 'visible');
+    }
     
     // now toggle the dashed line.
     toggleLine();
@@ -61,8 +66,12 @@ function togglePolling()
 
 function toggleLine()
 {
+    /*
+     Expecting a black line.
+     */
     var el = document.evaluate("//svg:path[@class='js-line' and contains(@style, 'rgb(0, 0, 0)')]", document, NSResolver, XPathResult.ANY_TYPE, null);
     el = el.iterateNext();
-//    alert("line: " + el + ' pollingOn = ' + pollingOn);
-    el.setAttribute('visibility', pollingOn ? 'hidden' : 'visible');
+    //    alert("line: " + el + ' pollingOn = ' + pollingOn);
+    if(el)
+	el.setAttribute('visibility', pollingOn ? 'hidden' : 'visible');
 }

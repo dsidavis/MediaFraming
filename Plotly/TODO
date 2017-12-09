@@ -1,0 +1,9 @@
+1. Make the fix.R more robust to structure rather than color
+   + Number of frames, houses, etc. to identify where the smooth and dashed lines, etc.  SVG groups
+
+1. Synthetic events
+
+1. Make the plotly plots with addMarker(), etc. rather than ggplot.
+1. Post-process the ggplot, and the plotly
+1. Look at other JS libraries
+

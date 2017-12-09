@@ -2,7 +2,7 @@ library(RJSONIO)
 library(XML)
 
 fix = 
-function(hfile, out = NA, doc = htmlParse(hfile), houses = c("ABC", "FOX"), inline = TRUE)
+function(hfile, out = NA, doc = htmlParse(hfile), houses = c("ABC", "FOX"), inline = TRUE, jsFile = "poll.js")
 {
     # Dealing with &lt;DOCTYPE in the first line of the HTML that gets written in the html file for the plot by R/plotly
     ll = readLines(hfile)
@@ -14,9 +14,9 @@ function(hfile, out = NA, doc = htmlParse(hfile), houses = c("ABC", "FOX"), inli
 
     # may want the type attribute.
     if(inline)
-       newXMLNode("script", paste(readLines("poll.js"), collapse = "\n"), attrs = c(type = "text/javascript"), parent = h)
+       newXMLNode("script", paste(readLines(jsFile), collapse = "\n"), attrs = c(type = "text/javascript"), parent = h)
     else
-       newXMLNode("script", attrs = c(src = "poll.js"), parent = h)        
+       newXMLNode("script", attrs = c(src = jsFile), parent = h)        
 
 
     def = sprintf("var HouseNames = %s;", toJSON(houses))

@@ -17,7 +17,7 @@ lapply(names(framePlots), function(name)
 framePlots.m = lapply(names(frames), function(name)
     plot_frames(frames[[name]], polls[[name]], frame_names, main = name,
                 interval = as.Date(format(frames[[name]]$date, "%Y-%m-01")),
-                polls = FALSE))
+                polls = TRUE))
 
 names(framePlots.m) = names(frames)
 framePlots.m
@@ -29,7 +29,7 @@ lapply(names(framePlots), function(name)
 framePlots.y = lapply(names(frames), function(name)
     plot_frames(frames[[name]], polls[[name]], frame_names, main = name,
                 interval = as.Date(format(frames[[name]]$date, "%Y-01-01")),
-                polls = FALSE))
+                polls = TRUE))
 
 names(framePlots.y) = names(frames)
 framePlots.y

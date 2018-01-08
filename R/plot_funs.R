@@ -43,19 +43,32 @@ plot_frames = function(df, df_polls, frame_names, main, interval = df$Week_start
         xlab("Date (week start)") +
         xlim(as.Date(c(min(byWeek$interval), "2013-01-01"))) + 
         scale_y_continuous(sec.axis = sec_axis(~., name = "Public polling"))+
-        ggtitle(main) 
-    if(polls)
-        a = a +            
-            geom_point(data = df_polls, aes(x = Date, y = Index, color = House, size = N),
-                       alpha = 0.5) +
-            geom_smooth(data = df_polls, aes(x = Date, y = Index), method = "loess",
-                        span = span, color = "gray", se = FALSE) +
-            geom_hline(yintercept = 50, linetype = "dashed")
+        ggtitle(main) +
+        theme_bw()
 
-    b = ggplotly(a, dynamicTicks = TRUE) 
-    #%>% layout(xaxis = list(rangeslider = list(type = "date"))) 
+    if(polls){
+        b = ggplot(df_polls, aes(x = Date, y = Index, color = House, size = N)) +
+            geom_point() +
+            geom_smooth(color = "gray", se = FALSE, span = 0.5) +
+            geom_hline(yintercept=50, show.legend = FALSE, linetype = "dashed", color = "black") +
+            theme_bw()
+        a = ggplotly(a, dynamicTicks = TRUE)
+        # browser()
+        b = ggplotly(b, dynamicTicks = TRUE)
+        subplot(a, b, nrows = 2, shareX = TRUE, heights = c(0.8, 0.2))
+    } else {
+        ggplotly(a, dynamicTicks = TRUE)
+    }
+    #     geom_point(data = df_polls, aes(x = Date, y = Index, color = House, size = N),
+    #                    alpha = 0.5) +
+    #         geom_smooth(data = df_polls, aes(x = Date, y = Index), method = "loess",
+    #                     span = span, color = "gray", se = FALSE) +
+    #         geom_hline(yintercept = 50, linetype = "dashed")
 
-    b
+    # b = ggplotly(a, dynamicTicks = TRUE) 
+    # #%>% layout(xaxis = list(rangeslider = list(type = "date"))) 
+
+    # b
 }
 
 plot_sources = function(df, main)

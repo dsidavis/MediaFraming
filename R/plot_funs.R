@@ -27,7 +27,8 @@ byInterval = function(df, interval)
 }
 
 plot_frames = function(df, df_polls, frame_names, main, interval = df$Week_start,
-                       polls = TRUE, span = 0.1)
+                       polls = TRUE, span = 0.1, events = NULL,
+                       eventLab = NULL)
 {
 
     byWeek = byInterval(df, interval)
@@ -41,18 +42,30 @@ plot_frames = function(df, df_polls, frame_names, main, interval = df$Week_start
         geom_line(data = byWeek[con,])+ 
         theme_bw() +
         xlab("Date (week start)") +
-        xlim(as.Date(c(min(byWeek$interval), "2013-01-01"))) + 
+        xlim(as.Date(c(min(byWeek$interval), "2017-01-01"))) + 
         scale_y_continuous(sec.axis = sec_axis(~., name = "Public polling"))+
         ggtitle(main) +
         theme_bw()
 
-    if(polls){
+    a = ggplotly(a, dynamicTicks = TRUE)
+    
+    if(!is.null(events)){
+        a = a %>% add_segments(x = ~events, y = max(byWeek$Count),
+                               xend = ~events, yend = min(byWeek$Count),
+                               inherit = FALSE, name = "Events",
+                               hoverinfo = "text", text = ~eventLab,
+                               line = list(dash = "dot", width = 1,
+                                           color = "rgba(67,67,67,1)"))
+    }
+        if(polls){
         b = ggplot(df_polls, aes(x = Date, y = Index, color = House, size = N)) +
             geom_point() +
             geom_smooth(color = "gray", se = FALSE, span = 0.5) +
-            geom_hline(yintercept=50, show.legend = FALSE, linetype = "dashed", color = "black") +
-            theme_bw()
-        a = ggplotly(a, dynamicTicks = TRUE)
+            geom_hline(yintercept=50, show.legend = FALSE,
+                       linetype = "dashed", color = "black") +
+            theme_bw() +
+            guides(color = guide_legend(title="Polls"),
+                   size = FALSE)
         # browser()
         b = ggplotly(b, dynamicTicks = TRUE)
         subplot(a, b, nrows = 2, shareX = TRUE, heights = c(0.8, 0.2))

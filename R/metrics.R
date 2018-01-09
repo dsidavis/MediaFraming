@@ -17,11 +17,15 @@
 # wks = seq(r[1], r[2], by = "week")
 #
 
+Delta = c("weeks" = 7, "days" = 1, years = 365)
+
 surgeInfo =
-function(ts, r = range(ts$date), bw = 2, timeUnit = "weeks")
+function(ts, bw = 2, r = range(ts$date), timeUnit = "weeks")
 {
     d = cut(ts$date, "weeks")
     counts = table(d)
     ans = sapply(seq(along = counts), function(i)  sum(counts[ min(i +bw, length(counts)) ]))
-    data.frame(counts = ans, dates = as.Date(names(counts)))
+    d = as.Date(names(counts))
+    delta = bw * Delta[timeUnit]
+    data.frame(counts = ans, startDates = d, endDates = d + delta)
 }
